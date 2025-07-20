@@ -1,0 +1,26 @@
+{
+  "name": "nostr-event-viewer",
+  "version": "1.0.0",
+  "description": "Nostr event viewer with web interface and CLI tool",
+  "main": "nostr-utils.js",
+  "scripts": {
+    "cli": "node nostr-cli.js",
+    "dev": "python3 -m http.server 8000",
+    "test": "node -e \"const {NostrClient} = require('./nostr-utils.js'); console.log('NostrClient loaded successfully')\""
+  },
+  "dependencies": {
+    "ws": "^8.14.2"
+  },
+  "bin": {
+    "nostr-events": "./nostr-cli.js"
+  },
+  "keywords": [
+    "nostr",
+    "events",
+    "cli",
+    "web",
+    "viewer"
+  ],
+  "author": "",
+  "license": "MIT"
+}

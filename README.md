@@ -1,149 +1,165 @@
 # Nostr Event Viewer
 
-A modern, responsive web application for searching and displaying Nostr events by tag. Built with vanilla JavaScript and designed for simplicity and performance.
+A web application and CLI tool for fetching and displaying Nostr events by tag or URI. Built with Preact/HTM for the web interface and Node.js for the CLI.
 
-## 🌟 Features
+## Features
 
-- **Real-time Event Fetching**: Connects to multiple Nostr relays simultaneously
-- **Tag-based Search**: Filter events using custom tag values
-- **Responsive Design**: Works seamlessly on desktop and mobile devices
-- **Modern UI**: Clean, gradient-based interface with smooth animations
-- **Multiple Relay Support**: Connects to 5 popular Nostr relays for comprehensive coverage
-- **Real-time Updates**: Events appear as they're received from relays
-- **Duplicate Prevention**: Automatically filters duplicate events
+- **Web Interface**: Modern, reactive UI built with Preact and HTM
+- **CLI Tool**: Command-line interface for fetching events programmatically
+- **Real-time**: Connects to multiple Nostr relays simultaneously
+- **URL Parameters**: Support for `?uri=` query parameter for direct linking
+- **Flexible**: Works with any commitment/tag structure
 
-## 🚀 Demo
+## Setup
 
-Visit the live demo: [https://nostrapps.github.io/fetchcommitments/](https://nostrapps.github.io/fetchcommitments/)
+### Prerequisites
 
-## 📱 Screenshots
+- Node.js (for CLI tool)
+- A web server (for the web interface)
 
-The application features a modern interface with:
-- Gradient header with clear branding
-- Simple tag input with search functionality
-- Real-time event cards with timestamps and content
-- Responsive design that adapts to any screen size
+### Installation
 
-## 🛠 Technology Stack
+1. Clone or download the project files
+2. Install dependencies for CLI tool:
+   ```bash
+   npm install
+   ```
 
-- **Frontend**: Vanilla JavaScript (ES6+)
-- **Styling**: CSS3 with modern features (Grid, Flexbox, Gradients)
-- **WebSockets**: Native WebSocket API for Nostr relay connections
-- **Deployment**: GitHub Pages
+## Usage
 
-## 📋 How It Works
+### Web Interface
 
-1. **Enter a Tag**: Input any Nostr tag value (e.g., `txo:tbtc4:...`)
-2. **Fetch Events**: Click "Fetch Events" or press Enter
-3. **Real-time Results**: Watch as events matching your tag appear in real-time
-4. **Event Details**: View event content, timestamps, and associated tags
+1. Start a local web server:
 
-## 🔧 Installation & Usage
+   ```bash
+   npm run dev
+   # or
+   python3 -m http.server 8000
+   ```
 
-### Option 1: Use Online (Recommended)
-Simply visit [https://nostrapps.github.io/fetchcommitments/](https://nostrapps.github.io/fetchcommitments/)
+2. Open your browser to `http://localhost:8000`
 
-### Option 2: Local Development
+3. Enter a tag/URI in the input field and click "Fetch Events"
+
+4. You can also use URL parameters:
+   ```
+   http://localhost:8000/?uri=your-commitment-uri-here
+   ```
+
+### CLI Tool
+
+The CLI tool provides a command-line interface for fetching Nostr events:
+
+#### Basic Usage
+
 ```bash
-# Clone the repository
-git clone https://github.com/nostrapps/fetchcommitments.git
+# Fetch events by tag
+node nostr-cli.js "txo:tbtc4:f0bf1cf69bfd3a7667bf4446683feba06dd6feda098f475e21682cc95f48124a:0"
 
-# Navigate to the project directory
-cd fetchcommitments
+# Using the --uri flag
+node nostr-cli.js --uri "your-commitment-uri"
 
-# Open in your browser
-open index.html
-# or serve with a local server
-python -m http.server 8000
+# Using npm script
+npm run cli -- "your-tag-here"
 ```
 
-## 🌐 Supported Relays
+#### Options
 
-The application connects to these popular Nostr relays:
-- `wss://relay.damus.io`
-- `wss://nos.lol`
-- `wss://relay.nostr.band`
-- `wss://relay.snort.social`
-- `wss://nostr-pub.wellorder.net`
-
-## 📡 Nostr Protocol
-
-This application implements the [Nostr protocol](https://github.com/nostr-protocol/nips) specifications:
-- **NIP-01**: Basic protocol flow
-- **NIP-12**: Filter and subscription management
-- Tag-based event filtering using the `#c` tag
-
-## 🎯 Use Cases
-
-- **Event Monitoring**: Track specific commitments or transactions
-- **Development & Testing**: Debug Nostr applications and event flows
-- **Research**: Analyze Nostr network activity and event patterns
-- **Education**: Learn how Nostr events and relays work
-
-## 🔍 Example Tags
-
-Try these example tag values:
-```
-txo:tbtc4:f0bf1cf69bfd3a7667bf4446683feba06dd6feda098f475e21682cc95f48124a:0
-commitment:example
-event:type:custom
+```bash
+--timeout <ms>     Timeout in milliseconds (default: 3000)
+--limit <number>   Limit number of events (default: 100)
+--json            Output in JSON format
+--relays <urls>   Comma-separated relay URLs
 ```
 
-## 🛡 Security Features
+#### Examples
 
-- **XSS Prevention**: All user content is properly escaped
-- **Connection Timeouts**: Prevents hanging connections
-- **Error Handling**: Graceful handling of network failures
-- **Input Validation**: Validates tag input before processing
+```bash
+# Basic fetch with custom timeout
+node nostr-cli.js "my-tag" --timeout 5000
 
-## 📱 Responsive Design
+# JSON output for programmatic use
+node nostr-cli.js "my-tag" --json
 
-- **Mobile-first**: Optimized for mobile devices
-- **Tablet Support**: Adapts to medium screen sizes
-- **Desktop**: Full-featured experience on large screens
-- **Accessibility**: Keyboard navigation and screen reader friendly
+# Custom relays
+node nostr-cli.js "my-tag" --relays "wss://relay1.com,wss://relay2.com"
 
-## 🔧 Configuration
+# Combine options
+node nostr-cli.js "my-tag" --timeout 10000 --limit 50 --json
+```
 
-The application uses sensible defaults but can be customized:
-- Relay list can be modified in the `relays` array
-- Event limit can be adjusted in the filter configuration
-- Styling can be customized via CSS variables
+## File Structure
 
-## 🤝 Contributing
+- `index.html` - Web interface
+- `main.js` - Preact web application
+- `styles.css` - Web interface styles
+- `utils.js` - Legacy utility functions
+- `nostr-utils.js` - Shared Nostr client library
+- `nostr-cli.js` - CLI tool
+- `package.json` - Node.js dependencies and scripts
 
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+## API Reference
 
-## 📝 License
+### NostrClient Class
 
-This project is open source and available under the [MIT License](LICENSE).
+The `NostrClient` class in `nostr-utils.js` provides the core functionality:
 
-## 🙏 Acknowledgments
+```javascript
+const { NostrClient } = require('./nostr-utils.js')
 
-- [Nostr Protocol](https://github.com/nostr-protocol/nips) - The decentralized social network protocol
-- [Damus](https://damus.io/) - For providing reliable relay infrastructure
-- The Nostr community for their continued development and support
+const client = new NostrClient([
+  'wss://relay.damus.io'
+  // ... custom relays
+])
 
-## 🐛 Issues & Support
+// Fetch events
+const events = await client.fetchEvents('tag-value', {
+  timeout: 3000,
+  limit: 100
+})
 
-If you encounter any issues or have questions:
-1. Check the [Issues](https://github.com/nostrapps/fetchcommitments/issues) page
-2. Create a new issue with detailed information
-3. Include steps to reproduce any bugs
+// Format for display
+const formatted = client.formatEventForDisplay(event)
 
-## 🚀 Future Enhancements
+// Clean up
+client.disconnect()
+```
 
-- [ ] Event caching for improved performance
-- [ ] Advanced filtering options
-- [ ] Export functionality for events
-- [ ] Custom relay configuration
-- [ ] Event visualization and analytics
-- [ ] Dark/light theme toggle
+### Methods
 
----
+- `fetchEvents(tagValue, options)` - Fetch events from relays
+- `formatEventForDisplay(event)` - Format event for display
+- `formatEventTime(timestamp)` - Format Unix timestamp
+- `truncateEventId(eventId, length)` - Truncate event ID
+- `escapeHtml(text)` - Escape HTML characters
+- `disconnect()` - Close all connections
 
-**Built with ❤️ for the Nostr community**
+## Nostr Relays
+
+Default relays used:
+
+- wss://relay.damus.io
+- wss://nos.lol
+- wss://relay.nostr.band
+- wss://relay.snort.social
+- wss://nostr-pub.wellorder.net
+
+You can specify custom relays using the `--relays` option in the CLI or by passing them to the NostrClient constructor.
+
+## Development
+
+### Testing the NostrClient
+
+```bash
+npm test
+```
+
+### Running the web interface in development
+
+```bash
+npm run dev
+```
+
+## License
+
+MIT
