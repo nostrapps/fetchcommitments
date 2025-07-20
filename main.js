@@ -9,6 +9,7 @@ function NostrEventViewer () {
     const [isFetching, setIsFetching] = useState(false);
     const [status, setStatus] = useState({ message: '', isError: false, visible: false });
     const [client, setClient] = useState(null);
+    const [autoFetchDone, setAutoFetchDone] = useState(false);
 
     // Initialize client
     useEffect(() => {
@@ -22,18 +23,21 @@ function NostrEventViewer () {
         };
     }, []);
 
-    // Handle URL parameters on mount
+    // Handle URL parameters after client is initialized
     useEffect(() => {
+        if (!client) return; // Wait for client to be initialized
+
         const urlParams = new URLSearchParams(window.location.search);
         const uriParam = urlParams.get('uri');
 
-        if (uriParam) {
+        if (uriParam && !autoFetchDone) {
             const decodedUri = decodeURIComponent(uriParam);
             setTagValue(decodedUri);
-            // Auto-fetch after setting the value
-            setTimeout(() => fetchEvents(decodedUri), 100);
+            // Auto-fetch immediately when URI is provided
+            fetchEvents(decodedUri);
+            setAutoFetchDone(true);
         }
-    }, []);
+    }, [client]); // Depend on client being available
 
     const showStatus = (message, isError = false) => {
         setStatus({ message, isError, visible: true });
@@ -58,13 +62,25 @@ function NostrEventViewer () {
         hideStatus();
 
         try {
+            // Real-time event handler
+            const handleNewEvent = (event) => {
+                setEvents(prevEvents => {
+                    // Check if event already exists
+                    if (prevEvents.find(e => e.id === event.id)) {
+                        return prevEvents;
+                    }
+                    // Add new event at the beginning
+                    return [event, ...prevEvents];
+                });
+            };
+
             const fetchedEvents = await client.fetchEvents(currentTagValue, {
                 timeout: 3000,
-                limit: 100
+                limit: 100,
+                onEvent: handleNewEvent
             });
 
-            setEvents(fetchedEvents);
-
+            // Update status based on final results
             if (fetchedEvents.length === 0) {
                 showStatus('No events found with the specified tag');
             } else {

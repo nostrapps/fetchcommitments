@@ -5,7 +5,6 @@ class NostrClient {
       'wss://relay.damus.io',
       'wss://nos.lol',
       'wss://relay.nostr.band',
-      'wss://relay.snort.social',
       'wss://nostr-pub.wellorder.net'
     ];
     this.connections = new Map();
@@ -72,11 +71,18 @@ class NostrClient {
   handleEvent (event) {
     if (!this.events.has(event.id)) {
       this.events.set(event.id, event);
+      // Call the event callback if provided
+      if (this.onEvent) {
+        this.onEvent(event);
+      }
     }
   }
 
   async fetchEvents (tagValue, options = {}) {
-    const { timeout = 3000, limit = 100 } = options;
+    const { timeout = 3000, limit = 100, onEvent = null } = options;
+
+    // Set the event callback for real-time updates
+    this.onEvent = onEvent;
 
     this.events.clear();
 
@@ -114,6 +120,8 @@ class NostrClient {
       }
     });
     this.connections.clear();
+    // Clear the event callback
+    this.onEvent = null;
   }
 
   formatEventTime (timestamp) {

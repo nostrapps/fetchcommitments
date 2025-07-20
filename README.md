@@ -141,7 +141,6 @@ Default relays used:
 - wss://relay.damus.io
 - wss://nos.lol
 - wss://relay.nostr.band
-- wss://relay.snort.social
 - wss://nostr-pub.wellorder.net
 
 You can specify custom relays using the `--relays` option in the CLI or by passing them to the NostrClient constructor.
