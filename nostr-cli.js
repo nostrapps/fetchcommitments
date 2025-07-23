@@ -78,6 +78,7 @@ async function main () {
           console.log(`  ID: ${formatted.id}`);
           console.log(`  Time: ${formatted.time}`);
           console.log(`  Tags: ${formatted.tags}`);
+          console.log(`  Pubkey: ${formatted.pubkey}`);
           if (formatted.content) {
             console.log(`  Content: ${formatted.content.substring(0, 100)}${formatted.content.length > 100 ? '...' : ''}`);
           }

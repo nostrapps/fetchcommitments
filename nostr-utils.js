@@ -22,7 +22,16 @@ class NostrClient {
         const WebSocketClass = typeof WebSocket !== 'undefined' ? WebSocket : require('ws');
         const ws = new WebSocketClass(relayUrl);
 
+        // Timeout for connection
+        const timeoutId = setTimeout(() => {
+          if (ws.readyState === (WebSocketClass.CONNECTING || 0)) {
+            ws.close();
+            reject(new Error(`Timeout connecting to ${relayUrl}`));
+          }
+        }, 5000);
+
         ws.onopen = () => {
+          clearTimeout(timeoutId);
           console.log(`Connected to ${relayUrl}`);
           const subscription = this.generateSubscriptionId();
           const request = ["REQ", subscription, filter];
@@ -45,22 +54,16 @@ class NostrClient {
         };
 
         ws.onerror = (error) => {
+          clearTimeout(timeoutId);
           console.error(`WebSocket error for ${relayUrl}:`, error);
           reject(error);
         };
 
         ws.onclose = () => {
+          clearTimeout(timeoutId);
           console.log(`Disconnected from ${relayUrl}`);
           this.connections.delete(relayUrl);
         };
-
-        // Timeout for connection
-        setTimeout(() => {
-          if (ws.readyState === (WebSocketClass.CONNECTING || 0)) {
-            ws.close();
-            reject(new Error(`Timeout connecting to ${relayUrl}`));
-          }
-        }, 5000);
 
       } catch (error) {
         reject(error);
@@ -153,7 +156,8 @@ class NostrClient {
       id: this.truncateEventId(event.id),
       time: this.formatEventTime(event.created_at),
       content: event.content || '',
-      tags: event.tags.map(tag => `${tag[0]}: ${tag[1] || ''}`).join(', ')
+      tags: event.tags.map(tag => `${tag[0]}: ${tag[1] || ''}`).join(', '),
+      pubkey: event.pubkey
     };
   }
 }
